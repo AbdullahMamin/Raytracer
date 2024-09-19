@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	Scene scene(atoi(argv[3]), argv[1]);
+	Scene scene(argv[1], atoi(argv[3]), atoi(argv[4]));
 	scene.print();
 	scene.render(argv[2]);
 

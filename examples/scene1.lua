@@ -14,20 +14,27 @@ return {
 			position = {-2, 0, 4},
 			radius = 1,
 			color = {0.0, 1.0, 0.0, 1.0}
+		},
+		{
+			position = {0, -5001, 0},
+			radius = 5000,
+			color = {1.0, 1.0, 0.0, 1.0}
 		}
 	},
 	lights = {
 		{
 			type = "ambient",
-			intensity = 1.0
-		},
-		{
-			type = "directional",
-			direction = {1.0, 0.0, -1.0}
+			intensity = 0.2
 		},
 		{
 			type = "point",
-			position = {0.0, 0.0, 100.0}
+			intensity = 0.6,
+			position = {2, 1, 0}
+		},
+		{
+			type = "directional",
+			intensity = 0.2,
+			direction = {1, 4, 4}
 		}
 	}
 }

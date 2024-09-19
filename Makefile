@@ -1,6 +1,6 @@
 CC := g++
 ERRFLAGS := -Wall -Wextra -Wpedantic -Werror
-LIBS := 
+LIBS := -llua5.4
 OPT := -O3
 CCFLAGS := -std=c++11
 

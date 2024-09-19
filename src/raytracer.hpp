@@ -27,6 +27,7 @@ enum LightType
 	LT_DIRECTIONAL
 };
 
+// Light direction is from surface point towards the light i.e. the light direction of the sun would direct at the sun, not from it.
 struct Light
 {
 	LightType type;
@@ -44,6 +45,7 @@ public:
 	
 private:
 	Color castRay(i32 x, i32 y);
+	f32 getLightIntensityAt(Vector point, Vector normal);
 
 private:
 	const Color m_background_color = {1.f, 1.f, 1.f, 1.f};

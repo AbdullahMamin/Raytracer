@@ -212,7 +212,7 @@ void Scene::render(const char *file_path)
 		for (i32 x = 0; x < m_size; x++)
 		{
 			Color color = castRay(x, y);
-			out_file << 255*color.r << " " << 255*color.g << " " << 255*color.b << " ";
+			out_file << (i32)(255*color.r) << " " << (i32)(255*color.g) << " " << (i32)(255*color.b) << " ";
 		}
 	}
 }
@@ -222,16 +222,56 @@ Color Scene::castRay(i32 x, i32 y)
 	Ray ray{{0.f, 0.f, 0.f}, {(f32)x/(f32)m_size - 0.5f, 0.5f - (f32)y/(f32)m_size, 1.f}};
 
 	f32 t_best = INFINITY;
-	Color color_best = m_background_color;
+	Sphere sphere_best;
 	for (auto sphere : m_spheres)
 	{
 		auto t = sphere.getRayIntersection(ray);
 		if (t.first > 0.f && t.first < t_best)
 		{
 			t_best = t.first;
-			color_best = sphere.color;
+			sphere_best = sphere;
 		}
 	}
-	
-	return color_best;
+
+	if (t_best != INFINITY)
+	{
+		Vector position = ray.at(t_best);
+		Vector normal = (position - sphere_best.position).normalize();
+
+		return getLightIntensityAt(position, normal)*sphere_best.color;
+	}
+
+	return m_background_color;
+}
+
+f32 Scene::getLightIntensityAt(Vector point, Vector normal)
+{
+	assert(fabs(normal.magnitude() - 1.f) < EPSILON); // make sure normal is unit length
+
+	f32 total_intensity = 0.f;
+	for (auto light : m_lights)
+	{
+		if (light.type == LT_AMBIENT)
+		{
+			total_intensity += light.intensity;
+		}
+		else if (light.type == LT_DIRECTIONAL)
+		{
+			f32 intensity = light.intensity*light.direction.normalize().dot(normal);
+			if (intensity >= 0.f) // to not add lights coming from behind the surface
+			{
+				total_intensity += intensity;
+			}
+		}
+		else // light.type == LT_POINT
+		{
+			f32 intensity = light.intensity*(light.position - point).normalize().dot(normal);
+			if (intensity >= 0.f) // to not add lights coming from behind the surface
+			{
+				total_intensity += intensity;
+			}
+		}
+	}
+
+	return total_intensity;
 }

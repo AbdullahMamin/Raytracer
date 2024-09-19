@@ -9,5 +9,6 @@ struct Color
 };
 
 Color operator+(Color c1, Color c2);
+Color operator*(f32 s, Color c);
 
 #endif // COLOR_HPP

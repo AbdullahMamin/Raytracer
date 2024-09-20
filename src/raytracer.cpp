@@ -216,12 +216,38 @@ void Scene::render(const char *file_path)
 {
 	std::ofstream out_file(file_path);
 
+	std::vector<std::vector<Color>> pixels(m_size, std::vector<Color>(m_size));
+
+	const i32 n_threads = 8;
+	std::vector<std::thread> threads;
+	auto thread_job = [&](i32 offset, i32 amount) {
+		for (i32 y = 0; y < m_size; y++)
+		{
+			for (i32 x = offset; x < offset + amount; x++)
+			{
+				pixels[y][x] = castRay({{0.f, 0.f, 0.f}, {(f32)x/(f32)m_size - 0.5f, 0.5f - (f32)y/(f32)m_size, 1.f}}, 0.f, m_max_bounces);
+			}
+		}
+	};
+
+	i32 amount_per_thread = m_size/n_threads;
+	for (i32 i = 0; i < n_threads - 1; i++)
+	{
+		threads.push_back(std::thread(thread_job, i*amount_per_thread, amount_per_thread));
+	}
+	threads.push_back(std::thread(thread_job, (n_threads - 1)*amount_per_thread, m_size - (n_threads - 1)*amount_per_thread));
+
+	for (auto &thread : threads)
+	{
+		thread.join();
+	}
+
 	out_file << "P3\n" << m_size << " " << m_size << "\n255\n";
 	for (i32 y = 0; y < m_size; y++)
 	{
 		for (i32 x = 0; x < m_size; x++)
 		{
-			Color color = castRay({{0.f, 0.f, 0.f}, {(f32)x/(f32)m_size - 0.5f, 0.5f - (f32)y/(f32)m_size, 1.f}}, 0.f, m_max_bounces);
+			Color color = pixels[y][x];
 			out_file << (i32)(255*color.r) << " " << (i32)(255*color.g) << " " << (i32)(255*color.b) << " ";
 		}
 	}

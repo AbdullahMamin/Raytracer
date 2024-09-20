@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
+#include <thread>
 #include "vector.hpp"
 #include "color.hpp"
 

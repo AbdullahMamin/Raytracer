@@ -3,22 +3,26 @@ return {
 		{
 			position = {0, -1, 3},
 			radius = 1,
-			color = {1.0, 0.0, 0.0, 1.0}
+			color = {1.0, 0.0, 0.0, 1.0},
+			specular = 500
 		},
 		{
 			position = {2, 0, 4},
 			radius = 1,
-			color = {0.0, 0.0, 1.0, 1.0}
+			color = {0.0, 0.0, 1.0, 1.0},
+			specular = 500
 		},
 		{
 			position = {-2, 0, 4},
 			radius = 1,
-			color = {0.0, 1.0, 0.0, 1.0}
+			color = {0.0, 1.0, 0.0, 1.0},
+			specular = 10
 		},
 		{
 			position = {0, -5001, 0},
 			radius = 5000,
-			color = {1.0, 1.0, 0.0, 1.0}
+			color = {1.0, 1.0, 0.0, 1.0},
+			specular = 1000
 		}
 	},
 	lights = {

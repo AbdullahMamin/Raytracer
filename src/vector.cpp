@@ -24,7 +24,7 @@ Vector Vector::cross(Vector v) const
 Vector Vector::reflect(Vector normal) const
 {
 	assert(fabs(normal.magnitude() - 1.f) < EPSILON); // make sure normal is unit length
-	return *this - 2.f*dot(normal)*normal;
+	return 2.f*dot(normal)*normal - *this;
 }
 
 Vector Ray::at(f32 t)
@@ -40,6 +40,11 @@ Vector operator+(Vector v1, Vector v2)
 Vector operator-(Vector v1, Vector v2)
 {
 	return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+}
+
+Vector operator-(Vector v)
+{
+	return {-v.x, -v.y, -v.z};
 }
 
 Vector operator*(Vector v1, Vector v2)

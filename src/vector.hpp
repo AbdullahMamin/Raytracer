@@ -25,6 +25,7 @@ struct Ray
 
 Vector operator+(Vector v1, Vector v2);
 Vector operator-(Vector v1, Vector v2);
+Vector operator-(Vector v);
 Vector operator*(Vector v1, Vector v2);
 Vector operator*(f32 s, Vector v);
 Vector operator/(Vector v1, Vector v2);

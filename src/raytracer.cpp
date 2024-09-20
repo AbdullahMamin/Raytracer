@@ -221,37 +221,43 @@ void Scene::render(const char *file_path)
 	{
 		for (i32 x = 0; x < m_size; x++)
 		{
-			Color color = castRay(x, y);
+			Color color = castRay({{0.f, 0.f, 0.f}, {(f32)x/(f32)m_size - 0.5f, 0.5f - (f32)y/(f32)m_size, 1.f}}, 0.f, m_max_bounces);
 			out_file << (i32)(255*color.r) << " " << (i32)(255*color.g) << " " << (i32)(255*color.b) << " ";
 		}
 	}
 }
 
-Color Scene::castRay(i32 x, i32 y)
+Color Scene::castRay(Ray ray, f32 t_min, i32 depth)
 {
-	Ray ray{{0.f, 0.f, 0.f}, {(f32)x/(f32)m_size - 0.5f, 0.5f - (f32)y/(f32)m_size, 1.f}};
-
 	f32 t_best = INFINITY;
 	Sphere sphere_best;
 	for (auto sphere : m_spheres)
 	{
 		auto t = sphere.getRayIntersection(ray);
-		if (t.first > 0.f && t.first < t_best)
+		if (t.first > t_min && t.first < t_best)
 		{
 			t_best = t.first;
 			sphere_best = sphere;
 		}
 	}
 
-	if (t_best != INFINITY)
+	if (t_best == INFINITY)
 	{
-		Vector position = ray.at(t_best);
-		Vector normal = (position - sphere_best.position).normalize();
-
-		return getLightIntensityAt(sphere_best.specular, -ray.direction, position, normal)*sphere_best.color;
+		return m_background_color;
 	}
 
-	return m_background_color;
+	Vector position = ray.at(t_best);
+	Vector normal = (position - sphere_best.position).normalize();
+	Color color = getLightIntensityAt(sphere_best.specular, -ray.direction, position, normal)*sphere_best.color;
+
+	if (sphere_best.reflective <= 0.f || depth <= 0)
+	{
+		return color;
+	}
+
+	Color color_from_reflection = castRay({position, (-ray.direction).reflect(normal)}, EPSILON, depth - 1);
+
+	return (1.f - sphere_best.reflective)*color + sphere_best.reflective*color_from_reflection;
 }
 
 f32 Scene::getLightIntensityAt(f32 specular_term, Vector view_direciton, Vector point, Vector normal)

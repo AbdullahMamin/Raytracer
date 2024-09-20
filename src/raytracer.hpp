@@ -46,11 +46,11 @@ public:
 	void render(const char *file_path);
 	
 private:
-	Color castRay(i32 x, i32 y);
+	Color castRay(Ray ray, f32 t_min, i32 depth);
 	f32 getLightIntensityAt(f32 specular_term, Vector view_direciton, Vector point, Vector normal);
 
 private:
-	const Color m_background_color = {1.f, 1.f, 1.f, 1.f};
+	const Color m_background_color = {0.f, 0.f, 0.f, 1.f};
 	i32 m_size;
 	i32 m_max_bounces;
 	

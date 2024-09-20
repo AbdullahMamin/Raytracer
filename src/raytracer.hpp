@@ -16,6 +16,7 @@ struct Sphere
 	Vector position;
 	f32 radius;
 	f32 specular;
+	f32 reflective;
 	Color color;
 
 	std::pair<f32, f32> getRayIntersection(Ray ray);

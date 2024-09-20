@@ -136,6 +136,10 @@ Scene::Scene(const char *file_path, i32 size, i32 max_bounces)
 				lua_getfield(L, -1, "specular");
 					sphere.specular = lua_tonumber(L, -1);
 				lua_pop(L, 1);
+
+				lua_getfield(L, -1, "reflective");
+					sphere.reflective = lua_tonumber(L, -1);
+				lua_pop(L, 1);
 				
 				lua_getfield(L, -1, "color");
 					lua_pushinteger(L, 1);
@@ -175,6 +179,7 @@ void Scene::print() const
 		std::cout << "\tposition = {" << sphere.position.x << ", " << sphere.position.y << ", " << sphere.position.z << "}\n";
 		std::cout << "\tradius = " << sphere.radius << "\n";
 		std::cout << "\tspecular = " << sphere.specular << "\n";
+		std::cout << "\treflective = " << sphere.reflective << "\n";
 		std::cout << "\tcolor = {" << sphere.color.r << ", " << sphere.color.g << ", " << sphere.color.b << ", " << sphere.color.a << "}\n";
 		std::cout << "----------------------\n";
 	}

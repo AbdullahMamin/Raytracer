@@ -15,6 +15,7 @@ struct Sphere
 {
 	Vector position;
 	f32 radius;
+	f32 specular;
 	Color color;
 
 	std::pair<f32, f32> getRayIntersection(Ray ray);
@@ -45,7 +46,7 @@ public:
 	
 private:
 	Color castRay(i32 x, i32 y);
-	f32 getLightIntensityAt(Vector point, Vector normal);
+	f32 getLightIntensityAt(f32 specular_term, Vector view_direciton, Vector point, Vector normal);
 
 private:
 	const Color m_background_color = {1.f, 1.f, 1.f, 1.f};

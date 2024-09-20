@@ -132,6 +132,10 @@ Scene::Scene(const char *file_path, i32 size, i32 max_bounces)
 				lua_getfield(L, -1, "radius");
 					sphere.radius = lua_tonumber(L, -1);
 				lua_pop(L, 1);
+
+				lua_getfield(L, -1, "specular");
+					sphere.specular = lua_tonumber(L, -1);
+				lua_pop(L, 1);
 				
 				lua_getfield(L, -1, "color");
 					lua_pushinteger(L, 1);
@@ -170,6 +174,7 @@ void Scene::print() const
 	{
 		std::cout << "\tposition = {" << sphere.position.x << ", " << sphere.position.y << ", " << sphere.position.z << "}\n";
 		std::cout << "\tradius = " << sphere.radius << "\n";
+		std::cout << "\tspecular = " << sphere.specular << "\n";
 		std::cout << "\tcolor = {" << sphere.color.r << ", " << sphere.color.g << ", " << sphere.color.b << ", " << sphere.color.a << "}\n";
 		std::cout << "----------------------\n";
 	}
@@ -238,13 +243,13 @@ Color Scene::castRay(i32 x, i32 y)
 		Vector position = ray.at(t_best);
 		Vector normal = (position - sphere_best.position).normalize();
 
-		return getLightIntensityAt(position, normal)*sphere_best.color;
+		return getLightIntensityAt(sphere_best.specular, -ray.direction, position, normal)*sphere_best.color;
 	}
 
 	return m_background_color;
 }
 
-f32 Scene::getLightIntensityAt(Vector point, Vector normal)
+f32 Scene::getLightIntensityAt(f32 specular_term, Vector view_direciton, Vector point, Vector normal)
 {
 	assert(fabs(normal.magnitude() - 1.f) < EPSILON); // make sure normal is unit length
 
@@ -257,18 +262,28 @@ f32 Scene::getLightIntensityAt(Vector point, Vector normal)
 		}
 		else if (light.type == LT_DIRECTIONAL)
 		{
-			f32 intensity = light.intensity*light.direction.normalize().dot(normal);
-			if (intensity >= 0.f) // to not add lights coming from behind the surface
+			f32 diffuse_scale = light.direction.normalize().dot(normal);
+			f32 cos_alpha = view_direciton.normalize().dot(light.direction.reflect(normal).normalize());
+			if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
 			{
-				total_intensity += intensity;
+				total_intensity += light.intensity*diffuse_scale;
+			}
+			if (cos_alpha > 0.f && specular_term > 0.f)
+			{
+				total_intensity += light.intensity*powf(cos_alpha, specular_term);
 			}
 		}
 		else // light.type == LT_POINT
 		{
-			f32 intensity = light.intensity*(light.position - point).normalize().dot(normal);
-			if (intensity >= 0.f) // to not add lights coming from behind the surface
+			f32 diffuse_scale = (light.position - point).normalize().dot(normal);
+			f32 cos_alpha = view_direciton.normalize().dot((light.position - point).reflect(normal).normalize());
+			if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
 			{
-				total_intensity += intensity;
+				total_intensity += light.intensity*diffuse_scale;
+			}
+			if (cos_alpha > 0.f && specular_term > 0.f)
+			{
+				total_intensity += light.intensity*powf(cos_alpha, specular_term);
 			}
 		}
 	}

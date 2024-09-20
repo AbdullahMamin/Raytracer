@@ -262,28 +262,60 @@ f32 Scene::getLightIntensityAt(f32 specular_term, Vector view_direciton, Vector 
 		}
 		else if (light.type == LT_DIRECTIONAL)
 		{
-			f32 diffuse_scale = light.direction.normalize().dot(normal);
-			f32 cos_alpha = view_direciton.normalize().dot(light.direction.reflect(normal).normalize());
-			if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
+			// Check for spheres that may block this light
+			bool in_shadow = false;
+			Ray ray = {point, light.direction};
+			for (auto sphere : m_spheres)
 			{
-				total_intensity += light.intensity*diffuse_scale;
+				auto t = sphere.getRayIntersection(ray);
+				if (t.first > 0.f && t.first < INFINITY)
+				{
+					in_shadow = true;
+					break;
+				}
 			}
-			if (cos_alpha > 0.f && specular_term > 0.f)
+
+			if (!in_shadow)
 			{
-				total_intensity += light.intensity*powf(cos_alpha, specular_term);
+				f32 diffuse_scale = light.direction.normalize().dot(normal);
+				f32 cos_alpha = view_direciton.normalize().dot(light.direction.reflect(normal).normalize());
+				if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
+				{
+					total_intensity += light.intensity*diffuse_scale;
+				}
+				if (cos_alpha > 0.f && specular_term > 0.f)
+				{
+					total_intensity += light.intensity*powf(cos_alpha, specular_term);
+				}
 			}
 		}
 		else // light.type == LT_POINT
 		{
-			f32 diffuse_scale = (light.position - point).normalize().dot(normal);
-			f32 cos_alpha = view_direciton.normalize().dot((light.position - point).reflect(normal).normalize());
-			if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
+			// Check for spheres that may block this light
+			bool in_shadow = false;
+			Ray ray = {point, light.position - point};
+			for (auto sphere : m_spheres)
 			{
-				total_intensity += light.intensity*diffuse_scale;
+				auto t = sphere.getRayIntersection(ray);
+				if (t.first > 0.f && t.first < 1.f) // Less than 1 since we don't want spheres further than the light to block the light
+				{
+					in_shadow = true;
+					break;
+				}
 			}
-			if (cos_alpha > 0.f && specular_term > 0.f)
+
+			if (!in_shadow)
 			{
-				total_intensity += light.intensity*powf(cos_alpha, specular_term);
+				f32 diffuse_scale = (light.position - point).normalize().dot(normal);
+				f32 cos_alpha = view_direciton.normalize().dot((light.position - point).reflect(normal).normalize());
+				if (diffuse_scale > 0.f) // to not add lights coming from behind the surface
+				{
+					total_intensity += light.intensity*diffuse_scale;
+				}
+				if (cos_alpha > 0.f && specular_term > 0.f)
+				{
+					total_intensity += light.intensity*powf(cos_alpha, specular_term);
+				}
 			}
 		}
 	}

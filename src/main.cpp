@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
 	if (argc != 5)
 	{
-		std::cout << "Usage: raytracer scene.lua out.bmp size max_bounces\n";
+		std::cout << "Usage: raytracer scene.lua out.ppm size max_bounces\n";
 		return 1;
 	}
 

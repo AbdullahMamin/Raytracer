@@ -6,4 +6,5 @@ This project depends on the lau5.4 library, simple compile all sources and link 
 
 ## Usage
 Run the executable with the following arguments: (scene.lua out.ppm size max_bounces)
+
 Some examples of scenes are provided.

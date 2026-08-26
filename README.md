@@ -1,6 +1,8 @@
 # Raytracer
 A raytracer that allows for defining scenes in a lua file and creating ppm images as renders.
 
+![Example render](assets/raytraced_scene.png)
+
 ## Build
 This project depends on the lau5.4 library, simply compile all sources and link against the library. The makefile provided works on linux and may need slight changes to work on other platforms.
 
